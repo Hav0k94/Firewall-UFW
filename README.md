@@ -1,20 +1,22 @@
 # Firewall UFW
-## Commandes lancé pour configurer UFW sur VPS/Serveur Debian Baded
+## Commandes lancés pour configurer UFW sur VPS/Serveur Debian Baded
+
+### Installation et règles par défaut
 
 Installe UFW | Refuse les connexions entrantes par défaut | Accepte les connexions sortantes par défaut
 
-```shell
+```
 sudo apt install ufw rsyslog -y
 sudo ufw default deny incoming
 sudo ufw default allow outgoing
 ```
-## UFW & Docker 
+### UFW & Docker 
 
 Petit tuto inspirer de ce problème pour faire cohabiter UFW & Docker : https://stackoverflow.com/questions/30383845/what-is-the-best-practice-of-docker-ufw-under-ubuntu
 
 A ajouter dans /etc/ufw/after.rules :
 
-```shell
+```
 vim /etc/ufw/adter.rules
 
 #### BEGIN UFW AND DOCKER
@@ -38,12 +40,18 @@ vim /etc/ufw/adter.rules
 COMMIT
 # END UFW AND DOCKER
 ```
-## Configurer ses règles 
-### SSH
-```shell
+### Configurer ses règles 
+#### SSH
+```
 sudo ufw allow from $IP_SOURCE to any port $PORT_SSH
 ```
-### Portainer
-```shell
+$IP_SOURCE = IP qui doit accéder au service \
+$PORT_SSH = Port utilisé par SSH (22 par défaut, ou autre si conf modifié) 
+
+#### Portainer
+```
 sudo ufw route allow from $IP_SOURCE to $IP_PORTAINER port $PORT_PORTAINER
 ```
+$IP_SOURCE = IP qui doit accéder au service \
+$IP_PORTAINER = IP utilisé par le docker portainer \
+$PORT_PORTAINER = Port utilisé par Portainer (⚠️ Il s'agit du port utilisé par le conteneur et non celui publié) 
