@@ -4,7 +4,7 @@
 Installe UFW | Refuse les connexions entrantes par défaut | Accepte les connexions sortantes par défaut
 
 ```shell
-sudo apt install ufw
+sudo apt install ufw rsyslog -y
 sudo ufw default deny incoming
 sudo ufw default allow outgoing
 ```
