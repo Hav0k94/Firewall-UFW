@@ -17,7 +17,7 @@ Petit tuto inspirer de ce problème pour faire cohabiter UFW & Docker : https://
 A ajouter dans /etc/ufw/after.rules :
 
 ```
-vim /etc/ufw/adter.rules
+vim /etc/ufw/after.rules
 
 #### BEGIN UFW AND DOCKER
 *filter
