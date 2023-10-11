@@ -43,14 +43,14 @@ COMMIT
 ### Configurer ses règles 
 #### SSH
 ```
-sudo ufw allow from $IP_SOURCE to any port $PORT_SSH
+sudo ufw allow proto tcp from $IP_SOURCE to any port $PORT_SSH
 ```
 $IP_SOURCE = IP qui doit accéder au service \
 $PORT_SSH = Port utilisé par SSH (22 par défaut, ou autre si conf modifié) 
 
 #### Portainer
 ```
-sudo ufw route allow from $IP_SOURCE to $IP_PORTAINER port $PORT_PORTAINER
+sudo ufw route allow proto tcp from $IP_SOURCE to $IP_PORTAINER port $PORT_PORTAINER
 ```
 $IP_SOURCE = IP qui doit accéder au service \
 $IP_PORTAINER = IP utilisé par le docker portainer \
