@@ -40,6 +40,11 @@ vim /etc/ufw/after.rules
 COMMIT
 # END UFW AND DOCKER
 ```
+Après cette modification il faut reload UFW
+```
+sudo ufw reload
+```
+
 ### Configurer ses règles 
 #### SSH
 ```
