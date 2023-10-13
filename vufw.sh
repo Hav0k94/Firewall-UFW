@@ -3,6 +3,22 @@
 # Le nom du fichier où vous voulez sauvegarder les règles UFW
 ufw_rules_file="ufw_custom_rules.txt"
 
+# Vérification si le fichier existe pour sauvegarder les commandes
+if [ -f "ufw_custom_rules.txt" ];then
+    echo "Le fichier $ufw_rules_file existe, pour sauvegarder les commande UFW."
+else
+    while [ ! -f "$ufw_rules_file" ]; do
+        echo "Le fichier $ufw_rules_file n'existe pas."
+        read -p "Voulez-vous le créer ? (y/n) " create_file
+        if [ "$create_file" == "y" ] || [ "$create_file" == "Y" ]; then
+            touch "$ufw_rules_file"
+            echo "Le fichier $ufw_rules_file a été créé."
+        else
+            echo "Le fichier n'a pas été créé."
+            exit 1 # Quitte le script
+        fi
+    done
+fi
 # Demander le nombre d'adresses IP sources à configurer
 read -p "Combien d'adresses IP sources voulez-vous configurer ? " num_ips
 
@@ -24,7 +40,7 @@ do
             ufw route allow proto tcp from $source_ip_for_docker to $ip_docker port $allowed_ports_for_docker
            
             # Ecris la règle dans un fichier
-            echo "ufw allow from $source_ip_for_docker to any port $allowed_ports_for_docker" >> $ufw_rules_file
+            echo "ufw route allow proto tcp from $source_ip_for_docker to $ip_docker port $allowed_ports_for_docker" >> $ufw_rules_file
             
             echo "La règle UFW pour l'adresse IP $source_ip_for_docker sur les ports $allowed_ports_for_docker a été configurée."
         
