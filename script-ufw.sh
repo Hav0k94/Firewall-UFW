@@ -9,18 +9,41 @@ read -p "Combien d'adresses IP sources voulez-vous configurer ? " num_ips
 # Parcourir chaque adresse IP source
 for ((i=1; i<=num_ips; i++))
 do
-    read -p "Saisissez l'adresse IP source #$i : " source_ip
+    read -p "La règle doit-elle être ajoutée pour un conteneur ? (y/n) " ufw_docker
+        if [ "$ufw_docker" == "y" ] || [ "$ufw_docker" == "Y" ]; then
+            # Demander l'adresse IP source autorisée
+            read -p "Saisissez l'adresse IP source #$i : " source_ip_for_docker
 
-    # Demander les ports autorisés pour cette adresse IP
-    read -p "Quels ports devraient être autorisés pour cette adresse IP ? (séparés par des virgules) " allowed_ports
+            # Demande l'adresse IP du conteneur
+            read -p "Saisissez l'adresse IP du conteneur : " ip_docker
 
-    # Créer la règle UFW pour l'adresse IP source
-    ufw allow from $source_ip to any port $allowed_ports
+            # Demande le port utilisé par le conteneur
+            read -p "Quels ports devraient être autorisés pour cette adresse IP ? (séparés par des virgules) (/!\ Attention il s'agit du port du conteneur et non celui exposé) " allowed_ports_for_docker
+            
+            # Ajoute la règle
+            ufw route allow proto tcp from $source_ip_for_docker to $ip_docker port $allowed_ports_for_docker
+           
+            # Ecris la règle dans un fichier
+            echo "ufw allow from $source_ip_for_docker to any port $allowed_ports_for_docker" >> $ufw_rules_file
+            
+            echo "La règle UFW pour l'adresse IP $source_ip_for_docker sur les ports $allowed_ports_for_docker a été configurée."
+        
+        elif [ "$ufw_docker" == "n" ] || [ "$ufw_docker" == "N" ]; then
+            read -p "Saisissez l'adresse IP source #$i : " source_ip
 
-    # Ajouter la règle au fichier
-    echo "ufw allow from $source_ip to any port $allowed_ports" >> $ufw_rules_file
+            # Demander les ports autorisés pour cette adresse IP
+            read -p "Quels ports devraient être autorisés pour cette adresse IP ? (séparés par des virgules) " allowed_ports
 
-    echo "La règle UFW pour l'adresse IP $source_ip sur les ports $allowed_ports a été configurée."
+            # Créer la règle UFW pour l'adresse IP source
+            ufw allow from $source_ip to any port $allowed_ports
+
+            # Ajouter la règle au fichier
+            echo "ufw allow from $source_ip to any port $allowed_ports" >> $ufw_rules_file
+
+            echo "La règle UFW pour l'adresse IP $source_ip sur les ports $allowed_ports a été configurée."
+        else 
+            echo "Vous devez répondre par (Y)es ou (N)o "
+        fi
 done
 
 # Activer UFW si ce n'est pas déjà fait
