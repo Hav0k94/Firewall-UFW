@@ -59,6 +59,7 @@ do
             echo "La règle UFW pour l'adresse IP $source_ip sur les ports $allowed_ports a été configurée."
         else 
             echo "Vous devez répondre par (Y)es ou (N)o "
+            exit 1 # Quitte le script
         fi
 done
 
