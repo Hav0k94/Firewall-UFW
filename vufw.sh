@@ -1,5 +1,51 @@
 #!/bin/bash
 
+# Vérifier si l'utilisateur exécute le script en tant que superutilisateur (root)
+if [ "$EUID" -ne 0 ]; then
+  echo "Ce script doit être exécuté en tant que superutilisateur (root)."
+  exit 1
+fi
+
+# Check si UFW est installé et si il ne l'est pas => l'installer
+
+if ! command -v ufw &>/dev/null; then
+    read -p "UFW n'est pas installé. Voulez-vous l'installer maintenant ? (y/n) " install_ufw
+    if [ "$install_ufw" == "y" ] || [ "$install_ufw" == "Y" ]; then
+        sudo apt update
+        sudo apt install ufw rsyslog
+        echo "UFW a été installé."
+        # Vérifier la politique par défaut pour les règles entrantes (incoming)
+        ufw_incoming_policy=$(ufw status | grep -i "Default: incoming (")
+        if [ -z "$ufw_incoming_policy" ]; then
+            read -p "La politique par défaut pour les règles entrantes n'est pas configurée. Voulez-vous la définir ? (y/n) " set_incoming_policy
+            if [ "$set_incoming_policy" == "y" ] || [ "$set_incoming_policy" == "Y" ]; then
+                read -p "Entrez la politique par défaut pour les règles entrantes (allow/deny/reject) : " incoming_policy
+                ufw default $incoming_policy incoming
+                echo "La politique par défaut pour les règles entrantes a été définie sur '$incoming_policy'."
+            else
+                echo "La politique par défaut pour les règles entrantes n'est pas configurée. Le script ne peut pas continuer sans la définir. Abandon."
+                exit 1
+            fi
+        fi
+        # Vérifier la politique par défaut pour les règles sortantes (outgoing)
+        ufw_outgoing_policy=$(ufw status | grep -i "Default: outgoing (")
+        if [ -z "$ufw_outgoing_policy" ]; then
+            read -p "La politique par défaut pour les règles sortantes n'est pas configurée. Voulez-vous la définir ? (y/n) " set_outgoing_policy
+            if [ "$set_outgoing_policy" == "y" ] || [ "$set_outgoing_policy" == "Y" ]; then
+                read -p "Entrez la politique par défaut pour les règles sortantes (allow/deny/reject) : " outgoing_policy
+                ufw default $outgoing_policy outgoing  
+                echo "La politique par défaut pour les règles sortantes a été définie sur '$outgoing_policy'."
+            else
+                echo "La politique par défaut pour les règles sortantes n'est pas configurée. Le script ne peut pas continuer sans la définir. Abandon."
+                exit 1
+            fi
+        fi
+    else
+        echo "UFW n'est pas installé. Le script ne peut pas continuer sans UFW. Abandon."
+        exit 1
+    fi
+fi
+
 # Le nom du fichier où vous voulez sauvegarder les règles UFW
 ufw_rules_file="ufw_custom_rules.txt"
 
@@ -19,6 +65,7 @@ else
         fi
     done
 fi
+
 # Demander le nombre d'adresses IP sources à configurer
 read -p "Combien d'adresses IP sources voulez-vous configurer ? " num_ips
 
