@@ -1,4 +1,8 @@
 # Firewall UFW
+
+VUFW = Very Uncomplicated FireWall. Pour rendre UFW encore plus facile.\
+Petit script perso pour m'amuser à faire des scripts bash et à configurer mes règles rapidement.
+
 ## Commandes lancés pour configurer UFW sur VPS/Serveur Debian Baded
 
 ### Installation et règles par défaut
